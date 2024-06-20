@@ -15,16 +15,16 @@ const validate = yup.object().shape({
 	date: yup
 		.date()
 		.typeError('Выберите корректную дату')
-		.min(new Date(), 'Дата не может быть меньше этого дня')
-		.when('number', {
-			is: (val: number | undefined) => !!val === true,
-			then: yup.date().required('Поле обязательно'),
-		}),
+		.min(new Date(), 'Дата не может быть меньше этого дня'),
+	// .when('number', {
+	// 	is: (val: number | undefined) => !!val === true,
+	// 	then: yup.date().required('Поле обязательно'),
+	// }),
 	names: yup.array().of(yup.string().required('Поле обязательно')),
 })
 function App() {
 	const { handleSubmit, control } = useForm<Form>({
-		resolver: yupResolver(validate) as unknown,
+		resolver: yupResolver(validate),
 	})
 
 	const { fields, append, remove } = useFieldArray({
