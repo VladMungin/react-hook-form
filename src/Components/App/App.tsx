@@ -11,15 +11,19 @@ import { Form } from '../../Types/types'
 import './App.css'
 
 const validate = yup.object().shape({
-	number: yup.number().typeError('Введите число').min(9999).max(1000000),
+	number: yup
+		.number()
+		.typeError('Введите число')
+		.min(10000)
+		.max(1000000)
+		.required('Поле должно содержать число от 10000 до 1000000'),
 	date: yup
 		.date()
 		.typeError('Выберите корректную дату')
-		.min(new Date(), 'Дата не может быть меньше этого дня'),
-	// .when('number', {
-	// 	is: (val: number | undefined) => !!val === true,
-	// 	then: yup.date().required('Поле обязательно'),
-	// }),
+		.min(new Date(), 'Дата не может быть меньше этого дня')
+		.when('number', (number, schema) => {
+			return number ? schema.required('Поле обязательно') : schema
+		}),
 	names: yup.array().of(yup.string().required('Поле обязательно')),
 })
 function App() {
@@ -42,24 +46,34 @@ function App() {
 				<Controller
 					control={control}
 					name='number'
-					render={({ field: { onChange, value } }) => (
+					render={({
+						field: { onChange, value },
+						fieldState: { invalid, error },
+					}) => (
 						<TextField
 							variant='outlined'
 							type='number'
+							label={error ? error.message : ''}
 							defaultValue={value}
 							onChange={onChange}
+							error={invalid}
 						/>
 					)}
 				/>
 				<Controller
 					control={control}
 					name='date'
-					render={({ field: { onChange, value } }) => (
+					render={({
+						field: { onChange, value },
+						fieldState: { invalid, error },
+					}) => (
 						<TextField
 							variant='outlined'
 							type='date'
 							defaultValue={value}
 							onChange={onChange}
+							label={error ? error.message : ''}
+							error={invalid}
 						/>
 					)}
 				/>
@@ -71,9 +85,14 @@ function App() {
 							<Controller
 								control={control}
 								name={`names.${index}`}
-								render={({ field: { onChange } }) => (
+								render={({
+									field: { onChange },
+									fieldState: { error, invalid },
+								}) => (
 									<TextField
 										variant='outlined'
+										label={error ? error.message : ''}
+										error={invalid}
 										type='text'
 										onChange={onChange}
 									/>
